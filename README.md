@@ -1,7 +1,10 @@
 # ALARS Labeling and Training
 
 ## Overview
-This repository contains the labeling and training pipeline used for the ALARS perception system.
+This repository contains the **labeling and training pipeline** used for the ALARS perception system.
+
+In addition to training, this repository is structured as a **ROS 2 resource package (without executables)**.  
+Its role within the ROS 2 workflow is to provide access to trained YOLO models in a standardized way, allowing other packages (e.g., perception) to load them directly using `FindPackageShare`, without manual file handling.
 
 It is designed for three main purposes:
 
@@ -18,6 +21,20 @@ This separation is useful because the two segmentation models require different 
 
 The trained YOLO models generated with this repository can later be used in the ROS 2 perception package: [alars_auv_perception](https://github.com/moyucrazy12/alars_auv_perception.git)
 
+---
+
+## Setup
+
+This package is a **ROS 2 resource package** designed to provide access to trained YOLO models (e.g., via `FindPackageShare`) without requiring manual file management.
+
+### ROS 2 Usage (Models Only)
+
+If this repository is added as a **submodule**, make sure to build it so the models become discoverable by other packages:
+
+```bash
+colcon build --symlink-install --packages-select alars_labeling_training
+source install/setup.bash
+```
 
 ---
 
@@ -289,6 +306,31 @@ After Stage 1 finishes, continue with Stage 2:
 
 ```bash
 python3 training_pipeline/train_stage2.py
+```
+---
+
+## Testing Process
+
+To evaluate a trained model, this repository provides a configurable evaluation script based on the dataset's `test` split.
+
+The evaluation process is fully configurable through a YAML file, where you can define:
+
+- model path  
+- dataset (`data.yaml`)  
+- classes and class names  
+- inference parameters (e.g., `imgsz`, `conf`, `iou`)  
+- output directory and debug options  
+
+Before running the evaluation, make sure to adjust the configuration file:
+
+```bash
+test_parameters.yaml
+```
+
+Then run:
+
+```bash
+python3 test_stage.py --config test_parameters.yaml
 ```
 
 ---
